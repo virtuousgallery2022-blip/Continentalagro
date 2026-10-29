@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Contact | Continental Agro Tarai Seeds</title>
     <meta name="description" content="Contact Continental Agro Tarai Seeds for wheat seed, dealer, bulk supply, farmer, and international business enquiries." />
+    <!-- SEO_METADATA -->
+    <!-- TURNSTILE_SCRIPT -->
     <link rel="icon" type="image/png" href="assets/brand-mark-clean.png" />
     <link rel="stylesheet" href="styles.css" />
   </head>
@@ -26,7 +28,7 @@
           <div class="contact-copy">
             <p class="eyebrow reveal">Reach us</p>
             <h2 class="reveal">Continental Agro Tarai Seeds</h2>
-            <p class="reveal">The form prepares an email draft to the company address. A backend, CRM, or Google Sheets workflow can be connected later.</p>
+            <p class="reveal">Send your enquiry directly to the Continental Agro Tarai Seeds team. For immediate assistance, call the helpline or email us.</p>
             <div class="contact-details reveal">
               <a href="mailto:Customerservices@continentalagro.com"><span>Email</span>Customerservices@continentalagro.com</a>
               <a href="tel:18001202845"><span>Helpline</span>1800 120 2845</a>
@@ -34,13 +36,17 @@
               <a href="https://www.continentalagro.in" target="_blank" rel="noreferrer"><span>Website</span>www.continentalagro.in</a>
             </div>
           </div>
-          <form class="contact-form reveal" id="contactForm">
-            <div class="form-row"><label>Name<input type="text" name="name" placeholder="Your name" required /></label><label>Phone<input type="tel" name="phone" placeholder="Phone number" required /></label></div>
-            <div class="form-row"><label>Email<input type="email" name="email" placeholder="you@example.com" required /></label><label>City / Country<input type="text" name="location" placeholder="City, country" required /></label></div>
+          <form class="contact-form reveal" id="contactForm" action="/api/contact" method="post" novalidate>
+            <div class="form-trap" aria-hidden="true"><label>Leave this field empty<input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
+            <input type="hidden" name="formStartedAt" id="formStartedAt" />
+            <div class="form-row"><label>Name<input type="text" name="name" placeholder="Your name" autocomplete="name" minlength="2" maxlength="100" required /></label><label>Phone<input type="tel" name="phone" placeholder="Phone number" autocomplete="tel" inputmode="tel" minlength="7" maxlength="32" required /></label></div>
+            <div class="form-row"><label>Email<input type="email" name="email" placeholder="you@example.com" autocomplete="email" maxlength="254" required /></label><label>City / Country<input type="text" name="location" placeholder="City, country" autocomplete="address-level2" minlength="2" maxlength="120" required /></label></div>
             <label>Enquiry Type<select name="enquiryType" required><option value="">Select an option</option><option>Distribution partnership</option><option>Bulk wheat seed supply</option><option>Dealer / retailer enquiry</option><option>International business enquiry</option><option>Farmer product enquiry</option></select></label>
-            <label>Message<textarea name="message" rows="5" placeholder="Tell us about your region, quantity, or partnership interest." required></textarea></label>
-            <button class="btn primary form-submit" type="submit">Prepare Email Enquiry</button>
-            <p class="form-status" id="formStatus" role="status"></p>
+            <label>Message<textarea name="message" rows="5" minlength="10" maxlength="3000" placeholder="Tell us about your region, quantity, or partnership interest." required></textarea></label>
+            <div class="cf-turnstile" data-sitekey="__TURNSTILE_SITE_KEY__" data-action="contact" data-theme="light"></div>
+            <p class="form-consent">Your details will be used to respond to this enquiry.</p>
+            <button class="btn primary form-submit" type="submit">Send Enquiry</button>
+            <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
           </form>
         </div>
       </section>

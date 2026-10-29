@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /.netlify/
+Disallow: /api/
+Sitemap: https://www.continentalagro.in/sitemap.xml

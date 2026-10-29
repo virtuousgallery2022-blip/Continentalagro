@@ -14,6 +14,21 @@ const lightbox = document.querySelector("[data-lightbox]");
 const lightboxImage = document.querySelector("[data-lightbox-image]");
 const lightboxClose = document.querySelector("[data-lightbox-close]");
 const accordionButtons = [...document.querySelectorAll("[data-accordion-trigger]")];
+const formStartedAt = document.querySelector("#formStartedAt");
+
+if (formStartedAt) formStartedAt.value = String(Date.now());
+
+const analyticsId = "__GA4_MEASUREMENT_ID__";
+if (/^G-[A-Z0-9]+$/i.test(analyticsId)) {
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function gtag() { window.dataLayer.push(arguments); };
+  window.gtag("js", new Date());
+  window.gtag("config", analyticsId, { anonymize_ip: true });
+  const analyticsScript = document.createElement("script");
+  analyticsScript.async = true;
+  analyticsScript.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(analyticsId)}`;
+  document.head.append(analyticsScript);
+}
 
 if (siteFooter) {
   siteFooter.innerHTML = `
@@ -197,40 +212,44 @@ window.addEventListener("keydown", (event) => {
 
 form?.addEventListener("submit", (event) => {
   event.preventDefault();
+  if (!form.reportValidity()) return;
+
   const formData = new FormData(form);
-  const name = formData.get("name").trim();
-  const phone = formData.get("phone").trim();
-  const email = formData.get("email").trim();
-  const location = formData.get("location").trim();
-  const enquiryType = formData.get("enquiryType").trim();
-  const message = formData.get("message").trim();
+  const payload = Object.fromEntries(formData.entries());
+  const submitButton = form.querySelector('[type="submit"]');
+  const originalLabel = submitButton?.textContent;
 
   statusText?.classList.remove("error");
-  if (!name || !phone || !email || !location || !enquiryType || !message) {
-    statusText.textContent = "Please complete all fields before sending your enquiry.";
-    statusText.classList.add("error");
-    return;
+  if (statusText) statusText.textContent = "Sending your enquiry...";
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.textContent = "Sending...";
   }
 
-  const subject = `New ${enquiryType} enquiry from ${name}`;
-  const body = [
-    "Hello Continental Agro Tarai Seeds team,",
-    "",
-    "I am interested in discussing the following enquiry:",
-    "",
-    `Name: ${name}`,
-    `Phone: ${phone}`,
-    `Email: ${email}`,
-    `City / Country: ${location}`,
-    `Enquiry Type: ${enquiryType}`,
-    "",
-    "Message:",
-    message,
-    "",
-    "Regards,",
-    name
-  ].join("\n");
-
-  statusText.textContent = "Opening your email app with a ready-to-send enquiry.";
-  window.location.href = `mailto:Customerservices@continentalagro.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  fetch("/api/contact", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+    .then(async (response) => {
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) throw new Error(result.message || "Your enquiry could not be sent. Please try again.");
+      if (statusText) statusText.textContent = result.message || "Thank you. Your enquiry has been received.";
+      form.reset();
+      if (formStartedAt) formStartedAt.value = String(Date.now());
+      window.turnstile?.reset();
+    })
+    .catch((error) => {
+      if (statusText) {
+        statusText.textContent = error.message || "A network error occurred. Please try again or contact us by phone or email.";
+        statusText.classList.add("error");
+      }
+      window.turnstile?.reset();
+    })
+    .finally(() => {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = originalLabel || "Send Enquiry";
+      }
+    });
 });

@@ -251,6 +251,10 @@ input:focus, select:focus, textarea:focus { border-color: var(--blue-500); box-s
 .form-submit { width: 100%; }
 .form-status { min-height: 24px; margin: 14px 0 0; color: var(--green-800); font-weight: 900; line-height: 1.5; }
 .form-status.error { color: #a73525; }
+.form-consent, .form-protection-note { margin: 10px 0 16px; color: var(--muted); font-size: .84rem; line-height: 1.6; }
+.form-protection-note a { color: var(--green-800); font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+.form-submit:disabled { cursor: not-allowed; opacity: .62; }
+.form-trap { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .site-footer {
   position: relative;
   overflow: hidden;
